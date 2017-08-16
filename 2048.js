@@ -15,6 +15,7 @@ class Game2048 {
 	$(this.board).append(this.foot);
 	$("body").append(this.board);
 	this.best_score = 0;
+	this.top_tile = 2048;
 	this.inittable();
     }
 
@@ -72,6 +73,7 @@ class Game2048 {
 	    }
 	}
 	this.end_game = false;
+	this.you_win = false;
 	this.set_score(0);
 	$($(this.foot).find("#end_tag")).text("");
 	this.fill_new_cell();
@@ -85,14 +87,14 @@ class Game2048 {
 	if(x>this.best_score){
 	    this.best_score = x;
 	    $($(this.head).find("#best_score_tag")).text(this.best_score);
-	    console.log("New record: "+this.best_score);
+	    //console.log("New record: "+this.best_score);
 	}
     }
     set_score(x){
 	this.score = x;
 	this.set_best_score(this.score);
 	$($(this.head).find("#score_tag")).text(this.score);
-	console.log("Score: "+this.score);
+	//console.log("Score: "+this.score);
     }
     draw_table_text(){
 	for(var i =0; i<4;i++){
@@ -102,7 +104,7 @@ class Game2048 {
 	}
     }
     get_text(x){
-	return (x==0)?("."):(x);
+	return (x==0)?(" "):(x);
     }
     get_cell(x,y){
 	return $(this.table).find("td[row_nb="+x+"][col_nb="+y+"]");
@@ -136,6 +138,12 @@ class Game2048 {
 	    console.log("no cell left in table");
 	    return this.check_end();
 	    //return false;
+	}
+	//console.log("WIN? "+this.you_win);
+	if(this.you_win){
+	    console.log("ending game on a win!!!");
+	    $($(this.foot).find("#end_tag")).text("YOU WIN!!!!");
+	    return true;
 	}
 	while(!done){
 	    var cell = Math.floor((Math.random()*16)+1)-1;
@@ -190,103 +198,136 @@ class Game2048 {
 	if(this.game_array[start_x][start_y] == this.game_array[end_x][end_y]){
 	    this.set_cell(end_x,end_y,this.game_array[start_x][start_y] + this.game_array[end_x][end_y]);
 	    this.set_cell(start_x,start_y,0);
+	    var mix_score = this.game_array[start_x][start_y] + this.game_array[end_x][end_y];
+	    if(mix_score == this.top_tile){
+		this.you_win = true;
+		console.log("You win!!!!");
+	    }
 	    this.set_score(this.score + this.game_array[start_x][start_y] + this.game_array[end_x][end_y]);
 	    //console.log("start:("+start_x+","+start_y+") -> end:("+end_x+","+end_y+")");
 	    return true;
 	}
 	return false;
     }
-    
+
     move(x,y){
-	//console.log("MOVING __ x: "+x+" - y:"+y);
-	for(var i=0;i<4;i++){
-	    if(y == 1 ){
-		var success = true;
-		while(success){
-		    success = false;
-		    for(var j=0;j<4;j++){
-			success = this.move_cell(i,j,i,j+1) || success;
-		    }
-		}
-		for(var j=0;j<4;j++){
-		    var tmp_success = this.mix_cell(i,j,i,j+1);
-		    success = tmp_success || success;
-		    if(tmp_success)
-			j++;
-		}
-		while(success){
-		    success = false;
-		    for(var j=0;j<4;j++){
-			success = this.move_cell(i,j,i,j+1) || success;
-		    }
-		}
-	    }
-	    else if(y == -1 ){
-		var success = true;
-		while(success){
-		    success = false;
-		    for(var j=0;j<4;j++){
-			success = this.move_cell(i,3-j,i,3-j-1) || success;
-		    }
-		}
-		for(var j=0;j<4;j++){
-		    var tmp_success = this.mix_cell(i,3-j,i,3-j-1);
-		    success = tmp_success || success;
-		    if(tmp_success)
-			j++;
-		}
-		while(success){
-		    success = false;
-		    for(var j=0;j<4;j++){
-			success = this.move_cell(i,3-j,i,3-j-1) || success;
-		    }
-		}
-	    }
-	    else if(x == 1 ){
-		var success = true;
-		while(success){
-		    success = false;
-		    for(var j=0;j<4;j++){
-			success =this.move_cell(j,i,j+1,i) ||  success;
-		    }
-		}
-		for(var j=0;j<4;j++){
-		    var tmp_success =this.mix_cell(j,i,j+1,i);
-		    success = tmp_success || success;
-		    if(tmp_success)
-			j++;
-		}
-		while(success){
-		    success = false;
-		    for(var j=0;j<4;j++){
-			success =this.move_cell(j,i,j+1,i) ||  success;
-		    }
-		}
-	    }
-	    else if(x == -1 ){
-		var success = true;
-		while(success){
-		    success = false;
-		    for(var j=0;j<4;j++){
-			success = this.move_cell(3-j,i,3-j-1,i) || success;
-		    }
-		}
-		for(var j=0;j<4;j++){
-		    var tmp_success = this.mix_cell(3-j,i,3-j-1,i);
-		    success = tmp_success || success;
-		    if(tmp_success)
-			j++;
-		}
-		while(success){
-		    success = false;
-		    for(var j=0;j<4;j++){
-			success = this.move_cell(3-j,i,3-j-1,i) || success;
-		    }
-		}
-	    }
-	}
-	this.end_game = this.fill_new_cell();
-	return this.end_game;
+    	//console.log("MOVING __ x: "+x+" - y:"+y);
+	var all_success = false;
+    	for(var i=0;i<4;i++){
+    	    if(y == 1 ){
+    		var success = true;
+    		while(success){
+    		    success = false;
+    		    for(var j=0;j<4;j++){
+    			success = this.move_cell(i,j,i,j+1) || success;
+    		    }
+		    if(success)
+			all_success = success || all_success;
+    		}
+    		for(var j=0;j<4;j++){
+    		    var tmp_success = this.mix_cell(i,j,i,j+1);
+    		    success = tmp_success || success;
+    		    if(tmp_success)
+    			j++;
+		    if(success)
+			all_success = success || all_success;
+    		}
+    		while(success){
+    		    success = false;
+    		    for(var j=0;j<4;j++){
+    			success = this.move_cell(i,j,i,j+1) || success;
+    		    }
+		    if(success)
+			all_success = success || all_success;
+    		}
+    	    }
+    	    else if(y == -1 ){
+    		var success = true;
+    		while(success){
+    		    success = false;
+    		    for(var j=0;j<4;j++){
+    			success = this.move_cell(i,3-j,i,3-j-1) || success;
+    		    }
+		    if(success)
+			all_success = success || all_success;
+    		}
+    		for(var j=0;j<4;j++){
+    		    var tmp_success = this.mix_cell(i,3-j,i,3-j-1);
+    		    success = tmp_success || success;
+    		    if(tmp_success)
+    			j++;
+		    if(success)
+			all_success = success || all_success;
+    		}
+    		while(success){
+    		    success = false;
+    		    for(var j=0;j<4;j++){
+    			success = this.move_cell(i,3-j,i,3-j-1) || success;
+    		    }
+		    if(success)
+			all_success = success || all_success;
+    		}
+    	    }
+    	    else if(x == 1 ){
+    		var success = true;
+    		while(success){
+    		    success = false;
+    		    for(var j=0;j<4;j++){
+    			success =this.move_cell(j,i,j+1,i) ||  success;
+    		    }
+		    if(success)
+			all_success = success || all_success;
+    		}
+    		for(var j=0;j<4;j++){
+    		    var tmp_success =this.mix_cell(j,i,j+1,i);
+    		    success = tmp_success || success;
+    		    if(tmp_success)
+    			j++;
+		    if(success)
+			all_success = success || all_success;
+    		}
+    		while(success){
+    		    success = false;
+    		    for(var j=0;j<4;j++){
+    			success =this.move_cell(j,i,j+1,i) ||  success;
+    		    }
+		    if(success)
+			all_success = success || all_success;
+    		}
+    	    }
+    	    else if(x == -1 ){
+    		var success = true;
+    		while(success){
+    		    success = false;
+    		    for(var j=0;j<4;j++){
+    			success = this.move_cell(3-j,i,3-j-1,i) || success;
+    		    }
+		    if(success)
+			all_success = success || all_success;
+    		}
+    		for(var j=0;j<4;j++){
+    		    var tmp_success = this.mix_cell(3-j,i,3-j-1,i);
+    		    success = tmp_success || success;
+    		    if(tmp_success)
+    			j++;
+		    if(success)
+			all_success = success || all_success;
+    		}
+    		while(success){
+    		    success = false;
+    		    for(var j=0;j<4;j++){
+    			success = this.move_cell(3-j,i,3-j-1,i) || success;
+    		    }
+		    if(success)
+			all_success = success || all_success;
+    		}
+    	    }
+    	}
+    	if(all_success)
+    	    this.end_game = this.fill_new_cell();
+    	else
+    	    this.end_game = this.check_end();
+    	return this.end_game;
     }
     move_left(){
 	//console.log("left");
@@ -306,25 +347,62 @@ class Game2048 {
     }
 
     beautify(){
+	$("body").css({
+	    "font-family":"Helvetica",
+	    "font-size":"1.5em"
+	});
 	$("td").css({
-	    "width":"50px",
-	    "height":"50px",
+	    "width":"20%",
+	    "height":"20%",
+	    "font-size":"3em",
+	    "font-weight":"bold",
+	    "color":"maroon",
+	    //"display":"inline-block",
+	    "text-align":"center",
+	    "vertical-align":"middle",
+	    "border-radius":"10px",
+	    //"border":"4px solid darkgrey",
+	    "background-color":"lightgrey"
 	});
 	$(".container").css({
 	    "width":"50%",
-	    "display":"block",
+	    //"display":"block",
 	    "text-align":"center",
 	    "margin":"auto",
-	    "background-color":"lightgrey",
-	    "border":"1px solid black"
+	    "padding":"auto",
+	    "border-radius":"25px",
+	    //"border":"1px solid black"
+	});
+	$(".heading").css({
+	    "margin-bottom":"5%",
+	    "margin-top":"5%",
 	});
 	$(".table").css({
+	    "width":"590px",
+	    "height":"590px",
 	    "text-align":"center",
-	    "margin-right":"25%",
-	    "margin-left":"25%",
+	    "margin":"auto",
+	    "border":"1px solid black",
+	    "border-radius":"5px",
+	    "border-spacing":"10px",
+	    "background-color":"teal",
+	    "padding":"15px"
 	    //"padding-left":"20%"
 	    //"padding-right":"20%"
 	});
+	
+	$(this.table).find("td:contains(.)").css({"background-color":"lightgrey"});
+	$(this.table).find("td:contains(2)").css({"background-color":"khaki"});
+	$(this.table).find("td:contains(4)").css({"background-color":"greenyellow"});
+	$(this.table).find("td:contains(8)").css({"background-color":"green"});
+	$(this.table).find("td:contains(16)").css({"background-color":"forestgreen"});
+	$(this.table).find("td:contains(32)").css({"background-color":"darkseagreen"});
+	$(this.table).find("td:contains(64)").css({"background-color":"darkolivegreen"});
+	$(this.table).find("td:contains(128)").css({"background-color":"darkgreen"});
+	$(this.table).find("td:contains(256)").css({"background-color":"darkgoldenrod"});
+	$(this.table).find("td:contains(512)").css({"background-color":"chocolate"});
+	$(this.table).find("td:contains(1024)").css({"background-color":"saddlebrown"});
+	$(this.table).find("td:contains(2048)").css({"background-color":"sienna"});
     }
     
 }
@@ -342,6 +420,7 @@ $.fn.dmqh = function (){
 	    case 40: game.move_down(); break;
 	    }
 	}
+	game.beautify();
     });
 }
 $(document).ready(function (){
