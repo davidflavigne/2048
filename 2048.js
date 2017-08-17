@@ -467,7 +467,7 @@ class Game2048 {
 	    "border-radius":"25px",
 	});
 	$(".heading").css({
-	    "margin-bottom":"5%",
+	    "margin-bottom":"1%",
 	    "margin-top":"5%",
 	});
 	$(".table").css({
@@ -477,6 +477,8 @@ class Game2048 {
 	    "width":"590px",
 	    "height":"590px",
 	    "margin":"auto",
+	    "margin-top":"0px",
+	    "margin-bottom":"0px",
 	    "text-align":"center",
 	    "padding":"auto"
 	});
@@ -486,6 +488,8 @@ class Game2048 {
 	    "position":"fixed",
 	    "text-align":"center",
 	    "margin":"auto",
+	    "margin-top":"0px",
+	    "margin-bottom":"0px",
 	    "border-radius":"15px",
 	    "border-spacing":"10px",
 	    "background-color":"teal",
@@ -634,6 +638,8 @@ class Game2048 {
 	// Pass in the target node, as well as the observer options
 	for(target of targets)
 	    observer.observe(target, config);
+
+	return this;
     } ;
 }( jQuery ));
 $(document).ready(function (){
