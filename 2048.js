@@ -17,7 +17,6 @@ class Game2048 {
 	this.top_tile = 2048;
 	this.theme = "default";
 	this.inittable();
-	this.history = [];
 	var clone = [];
 	for(var i=0;i<this.game_array.length;i++){
 	    var row = [];
@@ -46,10 +45,17 @@ class Game2048 {
 	$(undo).click(function(){
 	    game.undo();
 	});
+	var rewind = document.createElement("button");
+	$(rewind).text("Rewind");
+	$(rewind).addClass("undo");
+	$(rewind).click(function(){
+	    game.rewind();
+	});
 	$(result).append("<div id='score_div' class='score'>Score : <span id='score_tag'>0</span></div>");
 	$(result).append("<div id='best_score_div' class='score'>Best Score : <span id='best_score_tag'>0</span></div>");
 	$(result).append(newgame);
 	$(result).append(undo);
+	$(result).append(rewind);
 	return result;
     }
     buildContent(){
@@ -134,6 +140,7 @@ class Game2048 {
 	$("#overlay_win").addClass("overlay_hidden");
 	$("#overlay_win").removeClass("overlay_visible");
 	this.beautify();
+	this.history = [];
     }
     startNewGame(){
 	console.log("starting a new game");
@@ -165,6 +172,7 @@ class Game2048 {
 
 	    this.draw_table_text();
 	    this.beautify();
+	    return true;
 	}
 	else{
 	    this.history=[];
@@ -177,7 +185,21 @@ class Game2048 {
 		clone.push(row);
 	    }
 	    this.history.push(clone);
+	    return false;
 	}
+    }
+    rewind(){
+	var continuer = true;
+	var count = 0;
+	var game = this;
+	//while(continuer && count<4){
+	var id  = setInterval(function(){
+	    continuer = game.undo();
+	    if(!continuer)
+		clearInterval(id);
+	},500);
+	//count++;
+	//}
     }
     get_text(x){
 	switch(this.theme){
@@ -215,6 +237,7 @@ class Game2048 {
 	if(result){
 	    $("#overlay_lose").toggleClass("overlay_hidden");
 	    $("#overlay_lose").toggleClass("overlay_visible");
+	    this.history = [];
 	}
 	return result;
     }
@@ -228,6 +251,7 @@ class Game2048 {
 	    console.log("ending game on a win!!!");
 	    $("#overlay_win").toggleClass("overlay_hidden");
 	    $("#overlay_win").toggleClass("overlay_visible");
+	    this.history = [];
 	    return true;
 	}
 	while(!done){
