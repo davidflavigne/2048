@@ -15,6 +15,7 @@ class Game2048 {
 	$("body").append(this.board);
 	this.best_score = 0;
 	this.top_tile = 2048;
+	this.theme = "default";
 	this.inittable();
     }
 
@@ -62,10 +63,21 @@ class Game2048 {
 	$(banana_theme).text("BANANA !");
 	$(banana_theme).addClass("btn_theme");
 	$(banana_theme).attr("id","thm1");
+	var game = this;
+	$(banana_theme).click(function(){
+	    game.theme = "banana";
+	    game.draw_table_text();
+	    game.beautify();
+	});
 	var default_theme = document.createElement("button");
 	$(default_theme).text("DEFAULT");
 	$(default_theme).addClass("btn_theme");
 	$(default_theme).attr("id","thm2");
+	$(default_theme).click(function(){
+	    game.theme = "default";
+	    game.draw_table_text();
+	    game.beautify();
+	});
 	$(result).append(banana_theme);
 	$(result).append(default_theme);
 	return result;
@@ -80,7 +92,6 @@ class Game2048 {
 		var col = document.createElement("td");
 		$(col).attr({"row_nb":i,"col_nb":j});
 		$(col).text((this.game_array[i][j]==0)?(" "):(this.game_array[i][j]));
-		console.log(col);
 		$(row).append(col);
 	    }
 	    $(result).append(row);
@@ -91,7 +102,7 @@ class Game2048 {
 	this.game_array = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
 	for(var i =0; i<4;i++){
 	    for(var j =0; j<4; j++){
-		$(this.table).find("td[row_nb="+i+"][col_nb="+j+"]").text(this.get_text(this.game_array[i][j]));
+		$(this.table).find("td[row_nb="+i+"][col_nb="+j+"]").html(this.get_text(this.game_array[i][j]));
 	    }
 	}
 	this.end_game = false;
@@ -125,23 +136,32 @@ class Game2048 {
     draw_table_text(){
 	for(var i =0; i<4;i++){
 	    for(var j =0; j<4; j++){
-		$(this.table).find("td[row_nb="+i+"][col_nb="+j+"]").text(this.get_text(this.game_array[i][j]));
+		$(this.table).find("td[row_nb="+i+"][col_nb="+j+"]").html(this.get_text(this.game_array[i][j]));
 	    }
 	}
     }
     get_text(x){
-	return (x==0)?(" "):(x);
+	console.log("get_text:");
+	switch(this.theme){
+	case "banana":
+	    console.log("banane!!");
+	    return (x==0)?(" "):("<img src='images/banane_"+x+".png' alt='"+x+"' height='80%' width='80%'>");
+	case "default": 
+	default: 
+	    console.log("default!!");
+	    return (x==0)?(" "):(x);
+	}
     }
     get_cell(x,y){
 	return $(this.table).find("td[row_nb="+x+"][col_nb="+y+"]");
     }
     set_cell(x,y,z){
 	this.game_array[x][y] = z;
-	this.get_cell(x,y).text(this.get_text(z));
+	this.get_cell(x,y).html(this.get_text(z));
     }
     set_cell_animate(x,y,z){
 	this.game_array[x][y] = z;
-	this.get_cell(x,y).text(this.get_text(z));
+	this.get_cell(x,y).html(this.get_text(z));
     }
     check_end(){
 	var result = true;
