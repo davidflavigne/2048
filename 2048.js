@@ -41,6 +41,20 @@ class Game2048 {
     buildContent(){
 	var result = document.createElement("div");
 	$(result).addClass("container gametable");
+	var overlay_lose = document.createElement("div");
+	$(overlay_lose).attr("id","overlay_lose");
+	$(overlay_lose).addClass("overlay_hidden");
+	$(overlay_lose).text("GAME OVER");
+	$(overlay_lose).prepend("<br>");
+	$(overlay_lose).prepend("<br>");
+	var overlay_win = document.createElement("div");
+	$(overlay_win).attr("id","overlay_win");
+	$(overlay_win).addClass("overlay_hidden");
+	$(overlay_win).text("YOU WIN");
+	$(overlay_win).prepend("<br>");
+	$(overlay_win).prepend("<br>");
+	$(result).append(overlay_lose);
+	$(result).append(overlay_win);
 	return result;
     }
     
@@ -68,7 +82,6 @@ class Game2048 {
     }
     inittable(){
 	this.game_array = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
-	//this.game_array = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]];
 	for(var i =0; i<4;i++){
 	    for(var j =0; j<4; j++){
 		$(this.table).find("td[row_nb="+i+"][col_nb="+j+"]").text(this.get_text(this.game_array[i][j]));
@@ -80,6 +93,10 @@ class Game2048 {
 	$($(this.foot).find("#end_tag")).text("");
 	this.fill_new_cell();
 	this.fill_new_cell();
+	$("#overlay_lose").addClass("overlay_hidden");
+	$("#overlay_lose").removeClass("overlay_visible");
+	$("#overlay_win").addClass("overlay_hidden");
+	$("#overlay_win").removeClass("overlay_visible");
 	this.beautify();
     }
     startNewGame(){
@@ -131,8 +148,8 @@ class Game2048 {
 	    }
 	}
 	if(result){
-	    $($(this.foot).find("#end_tag")).text("GAME OVER!!!!");
-	    $(this.table).animate({"opacity":"0.2"});
+	    $("#overlay_lose").toggleClass("overlay_hidden");
+	    $("#overlay_lose").toggleClass("overlay_visible");
 	}
 	return result;
     }
@@ -141,12 +158,12 @@ class Game2048 {
 	if(this.is_full()){
 	    console.log("no cell left in table");
 	    return this.check_end();
-	    //return false;
 	}
-	//console.log("WIN? "+this.you_win);
 	if(this.you_win){
 	    console.log("ending game on a win!!!");
-	    $($(this.foot).find("#end_tag")).text("YOU WIN!!!!");
+	    //$($(this.foot).find("#end_tag")).text("YOU WIN!!!!");
+	    $("#overlay_win").toggleClass("overlay_hidden");
+	    $("#overlay_win").toggleClass("overlay_visible");
 	    return true;
 	}
 	while(!done){
@@ -155,13 +172,10 @@ class Game2048 {
 	    var cell_y = Math.floor(cell%4);
 	    var value = Math.floor((Math.random()*2)+1)*2;
 	    
-	    //console.log("CREATING NEW CELL");
 	    if(this.game_array[cell_x][cell_y] == 0){
-		//console.log("Cell " + cell+": "+value);
 		this.set_cell(cell_x,cell_y,value);
 		done = true;
 	    }
-	    //console.log("CREATING NEW CELL END");
 	}
 	return false;
     }
@@ -399,15 +413,40 @@ class Game2048 {
 	$(".table").css({
 	    "width":"590px",
 	    "height":"590px",
+	    "position":"fixed",
 	    "text-align":"center",
 	    "margin":"auto",
-	    //"border":"1px solid black",
 	    "border-radius":"15px",
 	    "border-spacing":"10px",
 	    "background-color":"teal",
-	    "padding":"15px"
-	    //"padding-left":"20%"
-	    //"padding-right":"20%"
+	    "padding":"15px",
+	    "z-index":"1"
+	});
+	
+	$(".overlay_hidden").css({
+	    "display":"none",
+	    "z-index":"-1",
+	    "opacity":"0",
+	    
+	});
+	
+	$(".overlay_visible").css({
+	    "display":"table-cell",
+	    "z-index":"100",
+	    "opacity":"0.8",
+	    
+	});
+	
+	$("#overlay_lose,#overlay_win").css({
+	    "position":"fixed",
+	    "width":"590px",
+	    "height":"590px",
+	    "text-align":"center",
+	    "vertical-align":"middle",
+	    "font-size":"3.5em",
+	    "border-radius":"15px",
+	    "border-spacing":"10px",
+	    "background-color":"white",
 	});
 	
 	$(".newgame").css({
@@ -462,23 +501,28 @@ class Game2048 {
     }
     
 }
-$.fn.dmqh = function (){
-    var game = new Game2048("Game2048");
-    game.beautify();
-    $("body").on("keydown",function(e){
-	//game.fill_new_cell();
-	if(game.end_game) console.log("It's the end of the game as we know it.");
-	if(!game.end_game){
-	    switch(e.which){
-	    case 37: game.move_left(); break;
-	    case 38: game.move_up(); break;
-	    case 39: game.move_right(); break;
-	    case 40: game.move_down(); break;
+(function ( $ ) {
+    
+    $.fn.dmqh = function (){
+	var game = new Game2048("Game2048");
+	game.beautify();
+	$("body").on("keydown",function(e){
+	    //game.fill_new_cell();
+	    if(game.end_game) console.log("It's the end of the game as we know it.");
+	    if(!game.end_game){
+		switch(e.which){
+		case 37: game.move_left(); break;
+		case 38: game.move_up(); break;
+		case 39: game.move_right(); break;
+		case 40: game.move_down(); break;
+		}
+		game.beautify();
 	    }
-	    game.beautify();
-	}
-    });
-}
+	});
+	
+    } 
+}( jQuery ));
 $(document).ready(function (){
     $("body").dmqh();
+    
 });
