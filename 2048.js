@@ -1,7 +1,6 @@
 class Game2048 {
     constructor(name){//build page structure
 	console.log("building "+name);
-	//this.game_array = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
 	this.game_array = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]];
 	this.board = document.createElement("div")
 	$(this.board).addClass("container");
@@ -30,9 +29,6 @@ class Game2048 {
 	$(newgame).click(function(){
 	    game.startNewGame();
 	});
-	//$(result).append("<button id='new_game_button'>New game</button><br>");
-	$(result).append("<br>");
-	$(result).append("<br>");
 	$(result).append("<div id='score_div' class='score'>Score : <span id='score_tag'>0</span></div>");
 	$(result).append("<div id='best_score_div' class='score'>Best Score : <span id='best_score_tag'>0</span></div>");
 	$(result).append(newgame);
@@ -62,6 +58,16 @@ class Game2048 {
 	var result = document.createElement("div");
 	$(result).addClass("container footer");
 	$(result).append("<br><span id='end_tag'></span><br>");
+	var banana_theme = document.createElement("button");
+	$(banana_theme).text("BANANA !");
+	$(banana_theme).addClass("btn_theme");
+	$(banana_theme).attr("id","thm1");
+	var default_theme = document.createElement("button");
+	$(default_theme).text("DEFAULT");
+	$(default_theme).addClass("btn_theme");
+	$(default_theme).attr("id","thm2");
+	$(result).append(banana_theme);
+	$(result).append(default_theme);
 	return result;
     }
 
@@ -74,6 +80,7 @@ class Game2048 {
 		var col = document.createElement("td");
 		$(col).attr({"row_nb":i,"col_nb":j});
 		$(col).text((this.game_array[i][j]==0)?(" "):(this.game_array[i][j]));
+		console.log(col);
 		$(row).append(col);
 	    }
 	    $(result).append(row);
@@ -93,6 +100,7 @@ class Game2048 {
 	$($(this.foot).find("#end_tag")).text("");
 	this.fill_new_cell();
 	this.fill_new_cell();
+	$("td").removeClass("new");
 	$("#overlay_lose").addClass("overlay_hidden");
 	$("#overlay_lose").removeClass("overlay_visible");
 	$("#overlay_win").addClass("overlay_hidden");
@@ -107,14 +115,12 @@ class Game2048 {
 	if(x>this.best_score){
 	    this.best_score = x;
 	    $($(this.head).find("#best_score_tag")).text(this.best_score);
-	    //console.log("New record: "+this.best_score);
 	}
     }
     set_score(x){
 	this.score = x;
 	this.set_best_score(this.score);
 	$($(this.head).find("#score_tag")).text(this.score);
-	//console.log("Score: "+this.score);
     }
     draw_table_text(){
 	for(var i =0; i<4;i++){
@@ -131,7 +137,10 @@ class Game2048 {
     }
     set_cell(x,y,z){
 	this.game_array[x][y] = z;
-	//$(this.table).find("td[row_nb="+x+"][col_nb="+y+"]").text(this.get_text(z));
+	this.get_cell(x,y).text(this.get_text(z));
+    }
+    set_cell_animate(x,y,z){
+	this.game_array[x][y] = z;
 	this.get_cell(x,y).text(this.get_text(z));
     }
     check_end(){
@@ -161,7 +170,6 @@ class Game2048 {
 	}
 	if(this.you_win){
 	    console.log("ending game on a win!!!");
-	    //$($(this.foot).find("#end_tag")).text("YOU WIN!!!!");
 	    $("#overlay_win").toggleClass("overlay_hidden");
 	    $("#overlay_win").toggleClass("overlay_visible");
 	    return true;
@@ -173,6 +181,7 @@ class Game2048 {
 	    var value = Math.floor((Math.random()*2)+1)*2;
 	    
 	    if(this.game_array[cell_x][cell_y] == 0){
+		$("td[row_nb="+cell_x+"][col_nb="+cell_y+"]").addClass("new");
 		this.set_cell(cell_x,cell_y,value);
 		done = true;
 	    }
@@ -189,10 +198,10 @@ class Game2048 {
 	return true;
     }
     cell_is_empty(x,y){
-	//console.log("empty : " + x + ","+y);
 	return (this.game_array[x][y] == 0);
     }
     move_cell(start_x,start_y,end_x,end_y){
+	$("td[row_nb="+start_x+"][col_nb="+start_y+"]").removeClass("new");
 	if(!(end_x>=0 && end_x<4 && end_y>=0 && end_y<4))
 	    return false;
 	if(this.cell_is_empty(start_x,start_y))
@@ -200,7 +209,6 @@ class Game2048 {
 	if(this.cell_is_empty(end_x,end_y)){
 	    this.set_cell(end_x,end_y,this.game_array[start_x][start_y]);
 	    this.set_cell(start_x,start_y,0);
-	    //console.log("start:("+start_x+","+start_y+") -> end:("+end_x+","+end_y+")");
 	    return true;
 	}
 	return false;
@@ -222,14 +230,12 @@ class Game2048 {
 		console.log("You win!!!!");
 	    }
 	    this.set_score(this.score + this.game_array[start_x][start_y] + this.game_array[end_x][end_y]);
-	    //console.log("start:("+start_x+","+start_y+") -> end:("+end_x+","+end_y+")");
 	    return true;
 	}
 	return false;
     }
 
     move(x,y){
-    	//console.log("MOVING __ x: "+x+" - y:"+y);
 	var all_success = false;
     	for(var i=0;i<4;i++){
     	    if(y == 1 ){
@@ -242,7 +248,6 @@ class Game2048 {
 		    if(success)
 			all_success = success || all_success;
     		}
-    		//for(var j=0;j<4;j++){
     		for(var j=3;j>=0;j--){
     		    var tmp_success = this.mix_cell(i,j,i,j+1);
     		    success = tmp_success || success;
@@ -270,7 +275,6 @@ class Game2048 {
 		    if(success)
 			all_success = success || all_success;
     		}
-    		//for(var j=0;j<4;j++){
     		for(var j=3;j>=0;j--){
     		    var tmp_success = this.mix_cell(i,3-j,i,3-j-1);
     		    success = tmp_success || success;
@@ -298,7 +302,6 @@ class Game2048 {
 		    if(success)
 			all_success = success || all_success;
     		}
-    		//for(var j=0;j<4;j++){
     		for(var j=3;j>=0;j--){
     		    var tmp_success =this.mix_cell(j,i,j+1,i);
     		    success = tmp_success || success;
@@ -326,7 +329,6 @@ class Game2048 {
 		    if(success)
 			all_success = success || all_success;
     		}
-    		//for(var j=0;j<4;j++){
     		for(var j=3;j>=0;j--){
     		    var tmp_success = this.mix_cell(3-j,i,3-j-1,i);
     		    success = tmp_success || success;
@@ -349,6 +351,8 @@ class Game2048 {
     	    this.end_game = this.fill_new_cell();
     	else if(this.is_full())
     	    this.end_game = this.check_end();
+
+	
     	return this.end_game;
     }
     move_left(){
@@ -379,21 +383,17 @@ class Game2048 {
 	    "font-size":"3em",
 	    "font-weight":"bold",
 	    "color":"#AB5513",
-	    //"display":"inline-block",
 	    "text-align":"center",
 	    "vertical-align":"middle",
 	    "border-radius":"10px",
-	    //"border":"4px solid darkgrey",
 	    "background-color":"lightgrey"
 	});
 	$(".container").css({
 	    "width":"60%",
-	    //"display":"block",
 	    "text-align":"center",
 	    "margin":"auto",
 	    "padding":"auto",
 	    "border-radius":"25px",
-	    //"border":"1px solid black"
 	});
 	$(".heading").css({
 	    "margin-bottom":"5%",
@@ -401,7 +401,6 @@ class Game2048 {
 	});
 	$(".table").css({
 	    "opacity":"1",
-	    //"background-color":"white",
 	});
 	$(".gametable").css({
 	    "width":"590px",
@@ -449,7 +448,7 @@ class Game2048 {
 	    "background-color":"white",
 	});
 	
-	$(".newgame").css({
+	$(".newgame,.btn_theme").css({
 	    "background-color":"chocolate",
 	    "width":"40%",
 	    "color":"white",
@@ -463,7 +462,6 @@ class Game2048 {
 	    "border-radius":"5px",
 	    "border": "none",
 	    "text-decoration": "none",
-	    //"float" :"right"
 	});
 	
 	$(".score").css({
@@ -475,7 +473,6 @@ class Game2048 {
 	    "width":"40%",
 	    "border-radius":"5px",
 	    "background-color":"chocolate",
-	    //"float":"left"
 	});
 	
 	$("#score_div").css({
@@ -485,7 +482,8 @@ class Game2048 {
 	$("#best_score_div").css({
 	    "margin-left":"5px"
 	});
-	
+
+	// Colors
 	$(this.table).find("td:contains(' ')").css({"background-color":"lightgrey"});
 	$(this.table).find("td:contains(2)").css({"background-color":"khaki"});
 	$(this.table).find("td:contains(4)").css({"background-color":"greenyellow"});
@@ -498,6 +496,9 @@ class Game2048 {
 	$(this.table).find("td:contains(512)").css({"background-color":"chocolate"});
 	$(this.table).find("td:contains(1024)").css({"background-color":"saddlebrown"});
 	$(this.table).find("td:contains(2048)").css({"background-color":"sienna"});
+
+
+	//some animations
     }
     
 }
@@ -507,7 +508,6 @@ class Game2048 {
 	var game = new Game2048("Game2048");
 	game.beautify();
 	$("body").on("keydown",function(e){
-	    //game.fill_new_cell();
 	    if(game.end_game) console.log("It's the end of the game as we know it.");
 	    if(!game.end_game){
 		switch(e.which){
@@ -519,8 +519,38 @@ class Game2048 {
 		game.beautify();
 	    }
 	});
+	var targets = $("td");
+	var observer = new MutationObserver(function( mutations ) {
+	    var appearing_mutations = [];
+	    console.log("mutations : "+mutations.length);
+	    for(mutation of mutations){
+	     	if(mutation.target.nodeName == "TD" && $(mutation.target).hasClass("new")){
+		    appearing_mutations.push(mutation);
+		}
+	    }
+	    console.log("appearing mutations : "+appearing_mutations.length);
+	    appearing_mutations.forEach(function( mutation ) {
+	    	if($(mutation.target).hasClass("new")){
+	    	    $(mutation.target).css({"opacity":"0","font-size":"0.2em","padding":"0px"});
+	    	    $(mutation.target).animate({"opacity":"1","font-size":"3em","padding":"5px"});
+	    	}
+	    });  
+	});
+
+	// Configuration of the observer:
+	var config = { 
+	    //attributes: true, 
+	    childList: true, 
+	    characterData: true,
+	    //subtree: true,
+	    //attributeOldValue: true,
+	    //characterDataOldValue: true
+	};
 	
-    } 
+	// Pass in the target node, as well as the observer options
+	for(target of targets)
+	    observer.observe(target, config);
+    } ;
 }( jQuery ));
 $(document).ready(function (){
     $("body").dmqh();
