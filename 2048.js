@@ -11,7 +11,7 @@ class Game2048 {
 	this.foot = this.buildFoot();
 	$(this.content).append(this.table);
 	$(this.board).append(this.head);
-	$(this.board).append(this.table);
+	$(this.board).append(this.content);
 	$(this.board).append(this.foot);
 	$("body").append(this.board);
 	this.best_score = 0;
@@ -38,7 +38,6 @@ class Game2048 {
 	$(result).append(newgame);
 	return result;
     }
-    
     buildContent(){
 	var result = document.createElement("div");
 	$(result).addClass("container gametable");
@@ -134,7 +133,6 @@ class Game2048 {
 	if(result){
 	    $($(this.foot).find("#end_tag")).text("GAME OVER!!!!");
 	    $(this.table).animate({"opacity":"0.2"});
-	    $(this.content).html("GAME OVER!!!!");
 	}
 	return result;
     }
@@ -335,7 +333,7 @@ class Game2048 {
     	}
     	if(all_success)
     	    this.end_game = this.fill_new_cell();
-    	else
+    	else if(this.is_full())
     	    this.end_game = this.check_end();
     	return this.end_game;
     }
@@ -392,8 +390,11 @@ class Game2048 {
 	    //"background-color":"white",
 	});
 	$(".gametable").css({
-	    "display":"table-cell",
-	    //"background-color":"white",
+	    "width":"590px",
+	    "height":"590px",
+	    "margin":"auto",
+	    "text-align":"center",
+	    "padding":"auto"
 	});
 	$(".table").css({
 	    "width":"590px",
