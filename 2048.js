@@ -17,6 +17,16 @@ class Game2048 {
 	this.top_tile = 2048;
 	this.theme = "default";
 	this.inittable();
+	this.history = [];
+	var clone = [];
+	for(var i=0;i<this.game_array.length;i++){
+	    var row = [];
+	    for(var j=0;j<this.game_array.length;j++){
+		row.push(this.game_array[i][j]);
+	    }
+	    clone.push(row);
+	}
+	this.history.push(clone);
     }
 
     buildHead(){
@@ -30,9 +40,16 @@ class Game2048 {
 	$(newgame).click(function(){
 	    game.startNewGame();
 	});
+	var undo = document.createElement("button");
+	$(undo).text("Undo");
+	$(undo).addClass("undo");
+	$(undo).click(function(){
+	    game.undo();
+	});
 	$(result).append("<div id='score_div' class='score'>Score : <span id='score_tag'>0</span></div>");
 	$(result).append("<div id='best_score_div' class='score'>Best Score : <span id='best_score_tag'>0</span></div>");
 	$(result).append(newgame);
+	$(result).append(undo);
 	return result;
     }
     buildContent(){
@@ -140,15 +157,34 @@ class Game2048 {
 	    }
 	}
     }
+    undo(){
+	if(this.history.length>1){
+	    console.log(this.history.length);
+	    this.history.pop();
+	    this.game_array = this.history[this.history.length -1];
+
+	    this.draw_table_text();
+	    this.beautify();
+	}
+	else{
+	    this.history=[];
+	    var clone = [];
+	    for(var i=0;i<this.game_array.length;i++){
+		var row = [];
+		for(var j=0;j<this.game_array.length;j++){
+		    row.push(this.game_array[i][j]);
+		}
+		clone.push(row);
+	    }
+	    this.history.push(clone);
+	}
+    }
     get_text(x){
-	console.log("get_text:");
 	switch(this.theme){
 	case "banana":
-	    console.log("banane!!");
 	    return (x==0)?(" "):("<img src='images/banane_"+x+".png' alt='"+x+"' height='80%' width='80%'>");
 	case "default": 
 	default: 
-	    console.log("default!!");
 	    return (x==0)?(" "):(x);
 	}
     }
@@ -367,8 +403,21 @@ class Game2048 {
     		}
     	    }
     	}
-    	if(all_success)
+    	if(all_success){
     	    this.end_game = this.fill_new_cell();
+	    var clone = [];
+	    for(var i=0;i<this.game_array.length;i++){
+		var row = [];
+		for(var j=0;j<this.game_array.length;j++){
+		    row.push(this.game_array[i][j]);
+		}
+		clone.push(row);
+	    }
+	    this.history.push(clone);
+	    // for(var i=0;i<this.history.length;i++){
+	    // 	console.log(this.history[this.history.length -i]);
+	    // }
+	}
     	else if(this.is_full())
     	    this.end_game = this.check_end();
 
@@ -412,6 +461,8 @@ class Game2048 {
 	    "width":"60%",
 	    "text-align":"center",
 	    "margin":"auto",
+	    "margin-top": "10px",
+	    //"top": "150px",
 	    "padding":"auto",
 	    "border-radius":"25px",
 	});
@@ -484,6 +535,19 @@ class Game2048 {
 	    "text-decoration": "none",
 	});
 	
+	$(".undo").css({
+	    "background-color":"darkcyan",
+	    "width":"40%",
+	    "color":"white",
+	    "margin-top":"5px",
+	    "font-size":"20px",
+	    "padding":"1%",
+	    //"display":"inline",
+	    "border-radius":"5px",
+	    "border": "none",
+	    "text-decoration": "none",
+	});
+	
 	$(".score").css({
 	    "font-size":"20px",
 	    "color":"white",
@@ -542,13 +606,13 @@ class Game2048 {
 	var targets = $("td");
 	var observer = new MutationObserver(function( mutations ) {
 	    var appearing_mutations = [];
-	    console.log("mutations : "+mutations.length);
+	    //console.log("mutations : "+mutations.length);
 	    for(mutation of mutations){
 	     	if(mutation.target.nodeName == "TD" && $(mutation.target).hasClass("new")){
 		    appearing_mutations.push(mutation);
 		}
 	    }
-	    console.log("appearing mutations : "+appearing_mutations.length);
+	    //console.log("appearing mutations : "+appearing_mutations.length);
 	    appearing_mutations.forEach(function( mutation ) {
 	    	if($(mutation.target).hasClass("new")){
 	    	    $(mutation.target).css({"opacity":"0","font-size":"0.2em","padding":"0px"});
