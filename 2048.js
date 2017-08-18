@@ -522,8 +522,12 @@ class Game2048 {
     }
     
     beautify(){
+	
+	$("head").append("<link href='https://fonts.googleapis.com/css?family=Luckiest+Guy' rel='stylesheet' type='text/css'>");
+
 	$("body").css({
 	    "font-family":"Helvetica",
+	    //"font-family":"'Luckiest Guy'",
 	    "font-size":"1.5em",
 	    "display":"table",
 	    "width":"98%",
@@ -618,6 +622,7 @@ class Game2048 {
 	});
 	
 	$(".newgame,.btn_theme").css({
+	    "font-family":"'Luckiest Guy'",
 	    "background-color":"chocolate",
 	    "width":"40%",
 	    "color":"white",
@@ -625,8 +630,8 @@ class Game2048 {
 	    "margin-left":"5px",
 	    "font-size":"20px",
 	    "padding":"2%",
-	    "padding-top":"2.3%",
-	    "padding-bottom":"2.3%",
+	    "padding-top":"1.7%",
+	    "padding-bottom":"1.7%",
 	    "display":"inline",
 	    "border-radius":"5px",
 	    "border": "none",
@@ -634,6 +639,7 @@ class Game2048 {
 	});
 	
 	$(".undo").css({
+	    "font-family":"'Luckiest Guy'",
 	    "background-color":"darkcyan",
 	    "width":"40%",
 	    "color":"white",
@@ -648,6 +654,7 @@ class Game2048 {
 	});
 	
 	$(".score").css({
+	    "font-family":"'Luckiest Guy'",
 	    "font-size":"20px",
 	    "color":"white",
 	    "margin":"auto",
@@ -703,6 +710,12 @@ class Game2048 {
 	});
 	$("h1").css({
 	    "margin-top":"0px"
+	});
+
+	$("#goal").css({
+	    "font-family":"'Luckiest Guy'",
+	    "font-size": "5em",
+	    "margin-bottom":"0px"
 	});
 	// Colors
 	$(this.table).find("td:contains(' ')").css({"background-color":"lightgrey"});
