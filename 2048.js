@@ -171,6 +171,7 @@ class Game2048 {
 	    this.game_array = this.history[this.history.length -1];
 
 	    this.draw_table_text();
+	    this.set_score(0);
 	    this.beautify();
 	    return true;
 	}
@@ -465,6 +466,24 @@ class Game2048 {
 	this.move(1,0);
     }
 
+    restore(old){
+	this.game_array = old["game_array"];
+	this.set_best_score (old["best_score"]);
+	this.set_score(old["score"]);
+	this.top_tile = old["top_tile"];
+	this.theme = old["theme"];
+	this.history = old["history"];
+	this.end_game = old["end_game"];
+	this.you_win = old["you_win"];
+	this.draw_table_text();
+	$($(this.foot).find("#end_tag")).text("");
+	$("td").removeClass("new");
+	$("#overlay_lose").addClass("overlay_hidden");
+	$("#overlay_lose").removeClass("overlay_visible");
+	$("#overlay_win").addClass("overlay_hidden");
+	$("#overlay_win").removeClass("overlay_visible");
+    }
+    
     beautify(){
 	$("body").css({
 	    "font-family":"Helvetica",
@@ -617,7 +636,20 @@ class Game2048 {
 (function ( $ ) {
     
     $.fn.dmqh = function (){
-	var game = new Game2048("Game2048");
+	var game = null;
+	if(typeof localStorage.Game2048 != 'undefined' && localStorage.Game2048 != 'undefined' && localStorage.Game2048.length > 0){
+	    game = new Game2048("Game2048");
+	    console.log("Retrieve local storage : "+localStorage.getItem("Game2048"));
+	    var oldgame = JSON.parse(localStorage.getItem("Game2048"));
+	    console.log("Retrieve local storage : "+oldgame);
+	    console.log(oldgame['game_array']);
+	    game.restore(oldgame);
+	}
+	else{
+	    console.log("New game");
+	    game = new Game2048("Game2048");
+	}
+	localStorage.setItem("Game2048",JSON.stringify(game));
 	game.beautify();
 	$("body").on("keydown",function(e){
 	    if(game.end_game) console.log("It's the end of the game as we know it.");
@@ -629,6 +661,7 @@ class Game2048 {
 		case 40: game.move_down(); break;
 		}
 		game.beautify();
+		localStorage.setItem("Game2048",JSON.stringify(game));
 	    }
 	});
 	var targets = $("td");
