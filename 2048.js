@@ -164,6 +164,16 @@ class Game2048 {
 	$("#overlay_win").removeClass("overlay_visible");
 	this.beautify();
 	this.history = [];
+	
+	var clone = [];
+	for(var i=0;i<this.game_array.length;i++){
+	    var row = [];
+	    for(var j=0;j<this.game_array.length;j++){
+		row.push(this.game_array[i][j]);
+	    }
+	    clone.push(row);
+	}
+	this.history.push(clone);
     }
     startNewGame(){
 	console.log("starting a new game");
@@ -203,15 +213,15 @@ class Game2048 {
 	    this.beautify();
 	    return true;
 	}
-	else if(this.history.length==1){
-	    console.log(this.history.length);
-	    this.game_array = this.history[this.history.length -1];
-	    this.history.pop();
-	    this.draw_table_text();
-	    this.set_score(0);
-	    this.beautify();
-	    return true;
-	}
+	// else if(this.history.length==1){
+	//     console.log(this.history.length);
+	//     this.game_array = this.history[this.history.length -1];
+	//     this.history.pop();
+	//     this.draw_table_text();
+	//     this.set_score(0);
+	//     this.beautify();
+	//     return true;
+	// }
 	else{
 	    this.history=[];
 	    var clone = [];
