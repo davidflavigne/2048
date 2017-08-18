@@ -4,14 +4,22 @@ class Game2048 {
 	this.game_array = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]];
 	this.board = document.createElement("div")
 	$(this.board).addClass("container");
+	$(this.board).attr("id","board");
 	this.head = this.buildHead();
 	this.content = this.buildContent();
 	this.table = this.buildTable();
 	this.foot = this.buildFoot();
+	this.left = this.buildSide("left");
+	this.center = this.buildSide("");
+	this.right = this.buildSide("right");
+	//this.buildRightSide(this.right);
 	$(this.content).append(this.table);
-	$(this.board).append(this.head);
-	$(this.board).append(this.content);
-	$(this.board).append(this.foot);
+	$(this.center).append(this.head);
+	$(this.center).append(this.content);
+	$(this.center).append(this.foot);
+	$(this.board).append(this.left);
+	$(this.board).append(this.center);
+	$(this.board).append(this.right);
 	$("body").append(this.board);
 	this.best_score = 0;
 	this.top_tile = 2048;
@@ -26,12 +34,26 @@ class Game2048 {
 	    clone.push(row);
 	}
 	this.history.push(clone);
+	var game = this;
+	$("#goal").mousedown(function(event){
+	    switch (event.which) {
+	    case 1: if(game.top_tile > 8) game.top_tile/=2;
+		break;
+	    case 3: game.top_tile*=2;
+	    }
+	    $(this).text(game.top_tile);
+	});
     }
-
+    buildSide(name){
+	var result = document.createElement("div");
+	if(name) $(result).addClass("container side "+name);
+	else $(result).addClass("container side");
+	return result;
+    }
     buildHead(){
 	var result = document.createElement("div");
 	$(result).addClass("container heading");
-	$(result).append("<h1>2048</h1>");
+	$(result).append("<h1 id='goal'>2048</h1>");
 	var newgame = document.createElement("button");
 	$(newgame).text("New Game");
 	$(newgame).addClass("newgame");
@@ -70,7 +92,8 @@ class Game2048 {
 	var overlay_win = document.createElement("div");
 	$(overlay_win).attr("id","overlay_win");
 	$(overlay_win).addClass("overlay_hidden");
-	$(overlay_win).text("YOU WIN");
+	//$(overlay_win).text("YOU WIN");
+	$(overlay_win).html("<img src='images/dancing-banana.gif' alt='WINNER' height='80%' width='80%'>");
 	$(overlay_win).prepend("<br>");
 	$(overlay_win).prepend("<br>");
 	$(result).append(overlay_lose);
@@ -159,6 +182,7 @@ class Game2048 {
     }
     draw_table_text(){
 	if(typeof this.game_array == 'undefined'){
+	    console.log("game array not found");
 	    this.inittable();
 	    return;
 	}
@@ -174,6 +198,15 @@ class Game2048 {
 	    this.history.pop();
 	    this.game_array = this.history[this.history.length -1];
 
+	    this.draw_table_text();
+	    this.set_score(0);
+	    this.beautify();
+	    return true;
+	}
+	else if(this.history.length==1){
+	    console.log(this.history.length);
+	    this.game_array = this.history[this.history.length -1];
+	    this.history.pop();
 	    this.draw_table_text();
 	    this.set_score(0);
 	    this.beautify();
@@ -202,7 +235,7 @@ class Game2048 {
 	    continuer = game.undo();
 	    if(!continuer)
 		clearInterval(id);
-	},500);
+	},250);
 	//count++;
 	//}
     }
@@ -491,7 +524,10 @@ class Game2048 {
     beautify(){
 	$("body").css({
 	    "font-family":"Helvetica",
-	    "font-size":"1.5em"
+	    "font-size":"1.5em",
+	    "display":"table",
+	    "width":"98%",
+	    "padding":"0px"
 	});
 	$("td").css({
 	    "width":"20%",
@@ -510,15 +546,24 @@ class Game2048 {
 	    "margin":"auto",
 	    "margin-top": "10px",
 	    //"top": "150px",
+	    "display":"table-cell",
 	    "padding":"auto",
 	    "border-radius":"25px",
+	    //"background-color":"chocolate",
 	});
 	$(".heading").css({
 	    "margin-bottom":"1%",
-	    "margin-top":"5%",
+	    "margin-top":"0%",
+	    "display":"table",
+	});
+	$(".footer").css({
+	    "margin-bottom":"0%",
+	    "margin-top":"0%",
+	    "display":"table",
 	});
 	$(".table").css({
 	    "opacity":"1",
+	    "display":"table",
 	});
 	$(".gametable").css({
 	    "width":"590px",
@@ -526,8 +571,10 @@ class Game2048 {
 	    "margin":"auto",
 	    "margin-top":"0px",
 	    "margin-bottom":"0px",
+	    "top":"0px",
 	    "text-align":"center",
-	    "padding":"auto"
+	    "padding":"auto",
+	    "display":"table",
 	});
 	$(".table").css({
 	    "width":"590px",
@@ -594,7 +641,7 @@ class Game2048 {
 	    "margin-right":"5px",
 	    "font-size":"20px",
 	    "padding":"1%",
-	    //"display":"inline",
+	    "display":"inline",
 	    "border-radius":"5px",
 	    "border": "none",
 	    "text-decoration": "none",
@@ -619,6 +666,44 @@ class Game2048 {
 	    "margin-left":"5px"
 	});
 
+	$("#board").css({
+	    
+	    "width":"95%",
+	    "display":"table",
+	    "vertical-align":"bottom",
+	    //"border":"1px solid black",
+	    "background-color":"white",
+	    "margin":"auto"
+	});
+
+	$(".left,.right").css({
+	    "width":"100%",
+	    "display":"table-cell",
+	    "background-color":"#FFEEDD",
+	    "margin":"auto",
+	    "vertical-align":"top",
+	});
+
+	$(".side").css({
+	    //"top":"0px",
+	});
+
+	$(".center").css({
+	    "top":"0px",
+	    "display":"table-cell",
+	    "background-color":"#FFEEDD",
+	});
+
+	$(".right").css({
+	    "float":"right"
+	});
+
+	$(".left").css({
+	    "float":"left"
+	});
+	$("h1").css({
+	    "margin-top":"0px"
+	});
 	// Colors
 	$(this.table).find("td:contains(' ')").css({"background-color":"lightgrey"});
 	$(this.table).find("td:contains(2)").css({"background-color":"khaki"});
