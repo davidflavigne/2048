@@ -523,11 +523,11 @@ class Game2048 {
     
     beautify(){
 	
-	$("head").append("<link href='https://fonts.googleapis.com/css?family=Luckiest+Guy' rel='stylesheet' type='text/css'>");
+	$("head").append("<link href='https://fonts.googleapis.com/css?family=Luckiest+Guy|Passion+One' rel='stylesheet' type='text/css'>");
 
 	$("body").css({
-	    "font-family":"Helvetica",
-	    //"font-family":"'Luckiest Guy'",
+	    //"font-family":"Helvetica",
+	    "font-family":"'Passion One'",
 	    "font-size":"1.5em",
 	    "display":"table",
 	    "width":"98%",
@@ -536,7 +536,7 @@ class Game2048 {
 	$("td").css({
 	    "width":"20%",
 	    "height":"20%",
-	    "font-size":"3em",
+	    "font-size":"4em",
 	    "font-weight":"bold",
 	    "color":"#AB5513",
 	    "text-align":"center",
@@ -780,7 +780,7 @@ class Game2048 {
 	    appearing_mutations.forEach(function( mutation ) {
 	    	if($(mutation.target).hasClass("new")){
 	    	    $(mutation.target).css({"opacity":"0","font-size":"0.2em","padding":"0px"});
-	    	    $(mutation.target).animate({"opacity":"1","font-size":"3em","padding":"5px"});
+	    	    $(mutation.target).animate({"opacity":"1","font-size":"5em","padding":"5px"});
 	    	}
 	    });  
 	});
