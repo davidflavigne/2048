@@ -158,6 +158,10 @@ class Game2048 {
 	$($(this.head).find("#score_tag")).text(this.score);
     }
     draw_table_text(){
+	if(typeof this.game_array == 'undefined'){
+	    this.inittable();
+	    return;
+	}
 	for(var i =0; i<4;i++){
 	    for(var j =0; j<4; j++){
 		$(this.table).find("td[row_nb="+i+"][col_nb="+j+"]").html(this.get_text(this.game_array[i][j]));
@@ -587,6 +591,7 @@ class Game2048 {
 	    "width":"40%",
 	    "color":"white",
 	    "margin-top":"5px",
+	    "margin-right":"5px",
 	    "font-size":"20px",
 	    "padding":"1%",
 	    //"display":"inline",
